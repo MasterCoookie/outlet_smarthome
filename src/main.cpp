@@ -43,6 +43,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
+void requestState() {
+  // publish state
+  StaticJsonDocument<244> doc;
+  doc["command"] = "getdeviceinfo";
+  doc["idx"] = 9;
+  char buffer[244];
+  serializeJson(doc, buffer);
+  client.publish("domoticz/in", buffer);
+  Serial.print("published: ");
+  Serial.println(buffer);
+}
+
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -92,13 +104,14 @@ void setup() {
   // mqtt connection starts
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
-  reconnect();
 }
 
 void loop() {
   if (!client.connected()) {
     reconnect();
   }
-
+  delay(1000);
+  Serial.println("Requesting state... ");
+  requestState();
   client.loop();
 }
