@@ -35,10 +35,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
     short unsigned int nvalue = doc["nvalue"];
     if(nvalue == 0) {
       Serial.println("LED OFF");
-      digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(LED_BUILTIN, HIGH);
     } else if(nvalue == 1) {
       Serial.println("LED ON");
-      digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(LED_BUILTIN, LOW);
     }
   }
 }
@@ -68,6 +68,10 @@ void reconnect() {
       Serial.println("Subscribing to topics:");
       Serial.println("esp/out/9");
       client.subscribe("esp/out/9");
+
+      delay(1000);
+      Serial.println("Requesting state... ");
+      requestState();
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -102,6 +106,7 @@ void setup() {
   // wifi connection ends
 
   // mqtt connection starts
+  Serial.print("Connecting to MQTT broker ");
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 }
@@ -110,8 +115,6 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-  delay(1000);
-  Serial.println("Requesting state... ");
-  requestState();
+  
   client.loop();
 }
