@@ -5,6 +5,8 @@
 
 #include "secret.h"
 
+#define LED_BUILTIN 2
+
 // wifi connection definitions
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -18,7 +20,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  for (unsigned int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
@@ -29,6 +31,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   // read values
   short unsigned int idx = doc["idx"];
+  if(idx == 9) {
+    short unsigned int nvalue = doc["nvalue"];
+    if(nvalue == 0) {
+      Serial.println("LED OFF");
+      digitalWrite(LED_BUILTIN, LOW);
+    } else if(nvalue == 1) {
+      Serial.println("LED ON");
+      digitalWrite(LED_BUILTIN, HIGH);
+    }
+  }
 }
 
 void reconnect() {
@@ -56,7 +68,10 @@ void reconnect() {
 
 
 void setup() {
+  delay(1000);
   Serial.begin(115200);
+
+  pinMode(LED_BUILTIN, OUTPUT);
 
   // wifi connection starts
   delay(10);
@@ -77,6 +92,7 @@ void setup() {
   // mqtt connection starts
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
+  reconnect();
 }
 
 void loop() {
