@@ -6,6 +6,7 @@
 #include "secret.h"
 
 #define LED_BUILTIN 2
+#define OUTLET_PIN 14
 
 // wifi connection definitions
 WiFiClient espClient;
@@ -36,9 +37,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if(nvalue == 0) {
       Serial.println("LED OFF");
       digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(OUTLET_PIN, HIGH);
     } else if(nvalue == 1) {
       Serial.println("LED ON");
       digitalWrite(LED_BUILTIN, LOW);
+      digitalWrite(OUTLET_PIN, LOW);
     }
   }
 }
